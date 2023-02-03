@@ -1,12 +1,13 @@
 import json
 from functools import partial
+
 from environs import Env
+import redis
 
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
-from redis_db_connect import get_database_connection
 from vk_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
 
@@ -82,10 +83,11 @@ if __name__ == "__main__":
     redis_host = env('REDiS_HOST')
     redis_port = env('REDIS_PORT')
     redis_password = env('REDIS_PASSWORD')
-    db = get_database_connection(
+    db = redis.Redis(
         host=redis_host,
         port=redis_port,
-        password=redis_password
+        password=redis_password,
+        decode_responses=True,
     )
 
     files_dir = env('QUESTIONS_DIR')

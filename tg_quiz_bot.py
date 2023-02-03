@@ -2,11 +2,11 @@ import logging
 import json
 from functools import partial
 
+import redis
 from environs import Env
 from telegram.ext import (CommandHandler, Filters,
                           MessageHandler, Updater)
 
-from redis_db_connect import get_database_connection
 from telegram_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
 
@@ -96,10 +96,11 @@ if __name__ == '__main__':
     redis_host = env('REDiS_HOST')
     redis_port = env('REDIS_PORT')
     redis_password = env('REDIS_PASSWORD')
-    db = get_database_connection(
+    db = redis.Redis(
         host=redis_host,
         port=redis_port,
-        password=redis_password
+        password=redis_password,
+        decode_responses=True,
     )
 
     files_dir = env('QUESTIONS_DIR')
