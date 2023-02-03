@@ -20,9 +20,7 @@ def send_welcome_message(event, vk_api):
     )
 
 
-def send_question(event, vk_api, questions):
-    db = database_connection()
-
+def send_question(event, vk_api, questions, db):
     question_with_answer = get_random_quiz_question(questions)
     question = question_with_answer.get('question')
     answer = question_with_answer.get('answer')
@@ -43,9 +41,7 @@ def send_question(event, vk_api, questions):
     )
 
 
-def check_answer(event, vk_api):
-    db = database_connection()
-
+def check_answer(event, vk_api, db):
     question_to_user = json.loads(db.get(event.user_id))
     if question_to_user:
         answer = question_to_user.get('answer').lower()
@@ -67,9 +63,7 @@ def check_answer(event, vk_api):
             )
 
 
-def send_answer(event, vk_api):
-    db = database_connection()
-
+def send_answer(event, vk_api, db):
     answer = json.loads(db.get(event.user_id)).get('answer')
 
     vk_api.messages.send(
@@ -88,8 +82,7 @@ if __name__ == "__main__":
     redis_host = env('REDiS_HOST')
     redis_port = env('REDIS_PORT')
     redis_password = env('REDIS_PASSWORD')
-    database_connection = partial(
-        get_database_connection,
+    db = get_database_connection(
         host=redis_host,
         port=redis_port,
         password=redis_password
@@ -97,7 +90,8 @@ if __name__ == "__main__":
 
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)
-    send_chosen_question = partial(send_question, questions=quiz_questions)
+    send_chosen_question = partial(send_question, questions=quiz_questions, db=db)
+
 
     vk_access_token = env('VK_ACCESS_TOKEN')
     vk_session = vk.VkApi(token=vk_access_token)
@@ -110,9 +104,9 @@ if __name__ == "__main__":
             if event.text == 'Новый вопрос':
                 send_chosen_question(event, vk_api)
             elif event.text == 'Сдаться':
-                send_answer(event, vk_api)
+                send_answer(event, vk_api, db)
             elif event.text:
                 try:
-                    check_answer(event, vk_api)
+                    check_answer(event, vk_api, db)
                 except NameError:
                     send_welcome_message(event, vk_api)
