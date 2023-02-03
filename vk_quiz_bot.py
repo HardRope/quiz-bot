@@ -114,5 +114,5 @@ if __name__ == "__main__":
             elif event.text:
                 try:
                     check_answer(event, vk_api)
-                except:
+                except NameError:
                     send_welcome_message(event, vk_api)
