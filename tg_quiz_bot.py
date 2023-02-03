@@ -92,7 +92,10 @@ if __name__ == '__main__':
     env = Env()
     env.read_env()
 
-    tg_token = env('TG_TOKEN')
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
 
     redis_host = env('REDiS_HOST')
     redis_port = env('REDIS_PORT')
@@ -104,15 +107,11 @@ if __name__ == '__main__':
         password=redis_password
     )
 
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO
-    )
-
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)
     handle_chosen_question_request = partial(handle_new_question_request, questions=quiz_questions)
 
+    tg_token = env('TG_TOKEN')
     updater = Updater(tg_token, use_context=True)
     dispatcher = updater.dispatcher
 
