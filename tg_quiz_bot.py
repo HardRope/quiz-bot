@@ -1,13 +1,13 @@
-from environs import Env
 import logging
 import json
 import enum
 
+from environs import Env
 import redis
 from telegram.ext import (CommandHandler, Filters,
                           MessageHandler, ConversationHandler, Updater)
 from telegram_tools.keyboards import main_keyboard
-from collect_questions import collect_questions, get_random_question
+from questions_module import collect_questions, get_random_question
 
 @enum.unique
 class States(enum.Enum):

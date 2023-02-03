@@ -7,7 +7,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
 from vk_tools.keyboards import main_keyboard
-from collect_questions import collect_questions, get_random_question
+from questions_module import collect_questions, get_random_question
 
 
 def get_database_connection():
