@@ -21,7 +21,7 @@ def welcome(event, vk_api):
 
 
 def send_question(event, vk_api, questions):
-    db = get_database_connection()
+    db = database_connection()
 
     question_with_answer = get_random_quiz_question(questions)
     question = question_with_answer.get('question')
@@ -44,7 +44,7 @@ def send_question(event, vk_api, questions):
 
 
 def check_answer(event, vk_api):
-    db = get_database_connection()
+    db = database_connection()
 
     question_to_user = json.loads(db.get(event.user_id))
     if question_to_user:
@@ -68,7 +68,7 @@ def check_answer(event, vk_api):
 
 
 def user_surrend(event, vk_api):
-    db = get_database_connection()
+    db = database_connection()
 
     answer = json.loads(db.get(event.user_id)).get('answer')
 
@@ -84,6 +84,16 @@ def user_surrend(event, vk_api):
 if __name__ == "__main__":
     env = Env()
     env.read_env()
+
+    redis_host = env('REDiS_HOST')
+    redis_port = env('REDIS_PORT')
+    redis_password = env('REDIS_PASSWORD')
+    database_connection = partial(
+        get_database_connection,
+        host=redis_host,
+        port=redis_port,
+        password=redis_password
+    )
 
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)

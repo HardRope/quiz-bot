@@ -29,7 +29,7 @@ def start(update, context):
 
 def handle_new_question_request(update, context, questions):
     chat_id = update.message.chat_id
-    db = get_database_connection()
+    db = database_connection()
 
     question_with_answer = get_random_quiz_question(questions)
     question = question_with_answer.get('question')
@@ -53,7 +53,7 @@ def handle_new_question_request(update, context, questions):
 def handle_solution_attempt(update, context):
     chat_id = update.message.chat_id
     message_text = update.message.text
-    db = get_database_connection()
+    db = database_connection()
 
 
     question_to_user = json.loads(db.get(chat_id))
@@ -77,7 +77,7 @@ def handle_solution_attempt(update, context):
 
 def handle_surrender(update, context):
     chat_id = update.message.chat_id
-    db = get_database_connection()
+    db = database_connection()
 
     answer = json.loads(db.get(chat_id)).get('answer')
 
@@ -93,6 +93,16 @@ if __name__ == '__main__':
     env.read_env()
 
     tg_token = env('TG_TOKEN')
+
+    redis_host = env('REDiS_HOST')
+    redis_port = env('REDIS_PORT')
+    redis_password = env('REDIS_PASSWORD')
+    database_connection = partial(
+        get_database_connection,
+        host=redis_host,
+        port=redis_port,
+        password=redis_password
+    )
 
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

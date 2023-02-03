@@ -1,12 +1,12 @@
 import redis
 
-def get_database_connection():
+def get_database_connection(host, port, password):
     global database
     if database is None:
         database = redis.Redis(
-            host=env('REDiS_HOST'),
-            port=env('REDIS_PORT'),
-            password=env('REDIS_PASSWORD'),
+            host=host,
+            port=port,
+            password=password,
             decode_responses=True,
         )
     return database
