@@ -11,7 +11,7 @@ from vk_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
 
 
-def welcome(event, vk_api):
+def send_welcome_message(event, vk_api):
     vk_api.messages.send(
         user_id=event.user_id,
         message='Добро пожаловать в QuizBot! Докажи, что ты - самый умный :)',
@@ -67,7 +67,7 @@ def check_answer(event, vk_api):
             )
 
 
-def user_surrend(event, vk_api):
+def send_answer(event, vk_api):
     db = database_connection()
 
     answer = json.loads(db.get(event.user_id)).get('answer')
@@ -110,9 +110,9 @@ if __name__ == "__main__":
             if event.text == 'Новый вопрос':
                 send_chosen_question(event, vk_api)
             elif event.text == 'Сдаться':
-                user_surrend(event, vk_api)
+                send_answer(event, vk_api)
             elif event.text:
                 try:
                     check_answer(event, vk_api)
                 except:
-                    welcome(event, vk_api)
+                    send_welcome_message(event, vk_api)
