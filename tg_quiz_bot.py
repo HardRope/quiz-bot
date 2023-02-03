@@ -41,14 +41,15 @@ def start(update, context):
         reply_markup=main_keyboard()
     )
 
-    return CHOOSING
-
 
 def handle_new_question_request(update, context, questions):
     chat_id = update.message.chat_id
     db = get_database_connection()
 
-    question, answer = get_random_question(questions)
+    question_with_answer = get_random_quiz_question(questions)
+    question = question_with_answer.get('question')
+    answer = question_with_answer.get('answer')
+
     context.bot.send_message(
         chat_id=chat_id,
         text=question,

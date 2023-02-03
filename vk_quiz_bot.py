@@ -8,7 +8,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
 from vk_tools.keyboards import main_keyboard
-from questions_module import collect_questions, get_random_question
+from questions_module import collect_questions, get_random_quiz_question
 
 
 def get_database_connection():
@@ -35,7 +35,10 @@ def welcome(event, vk_api):
 def send_question(event, vk_api, questions):
     db = get_database_connection()
 
-    question, answer = get_random_question(questions)
+    question_with_answer = get_random_quiz_question(questions)
+    question = question_with_answer.get('question')
+    answer = question_with_answer.get('answer')
+
     vk_api.messages.send(
         user_id=event.user_id,
         message=question,
