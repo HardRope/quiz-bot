@@ -1,12 +1,5 @@
 import random
 import glob
-from environs import Env
-
-env = Env()
-env.read_env()
-
-files_dir = env('QUESTIONS_DIR')
-files_paths = glob.glob(f'{files_dir}/*.txt')
 
 
 def parse_file(file_path):
@@ -26,7 +19,8 @@ def parse_file(file_path):
     return file_questions
 
 
-def collect_questions():
+def collect_questions(files_dir):
+    files_paths = glob.glob(f'{files_dir}/*.txt')
     questions = []
     for path in files_paths:
         file_questions = parse_file(path)

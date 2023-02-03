@@ -114,8 +114,8 @@ if __name__ == '__main__':
         level=logging.INFO
     )
     logger = logging.getLogger(__name__)
-
-    quiz_questions = collect_questions()
+    files_dir = env('QUESTIONS_DIR')
+    quiz_questions = collect_questions(files_dir)
 
     database = None
     database = get_database_connection()
