@@ -1,26 +1,14 @@
 import json
 from functools import partial
 from environs import Env
-import redis
 
 import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
+from redis_db_connect import get_database_connection
 from vk_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
-
-
-def get_database_connection():
-    global database
-    if database is None:
-        database = redis.Redis(
-            host=env('REDiS_HOST'),
-            port=env('REDIS_PORT'),
-            password=env('REDIS_PASSWORD'),
-            decode_responses=True,
-        )
-    return database
 
 
 def welcome(event, vk_api):

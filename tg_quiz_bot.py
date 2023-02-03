@@ -3,25 +3,14 @@ import json
 from functools import partial
 
 from environs import Env
-import redis
 from telegram.ext import (CommandHandler, Filters,
                           MessageHandler, Updater)
 
+from redis_db_connect import get_database_connection
 from telegram_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
 
 logger = logging.getLogger(__name__)
-
-def get_database_connection():
-    global database
-    if database is None:
-        database = redis.Redis(
-            host=env('REDiS_HOST'),
-            port=env('REDIS_PORT'),
-            password=env('REDIS_PASSWORD'),
-            decode_responses=True,
-        )
-    return database
 
 
 def error(update, context):
