@@ -1,19 +1,14 @@
 import logging
 import json
-import enum
 from functools import partial
 
 from environs import Env
 import redis
 from telegram.ext import (CommandHandler, Filters,
-                          MessageHandler, ConversationHandler, Updater)
+                          MessageHandler, Updater)
 
 from telegram_tools.keyboards import main_keyboard
-from questions_module import collect_questions, get_random_question
-
-@enum.unique
-class States(enum.Enum):
-    CHOOSING = 1
+from questions_module import collect_questions, get_random_quiz_question
 
 
 def get_database_connection():
@@ -64,8 +59,6 @@ def handle_new_question_request(update, context, questions):
         })
     )
 
-    return CHOOSING
-
 
 def handle_solution_attempt(update, context):
     chat_id = update.message.chat_id
@@ -90,7 +83,6 @@ def handle_solution_attempt(update, context):
                 text='Неправильно… Попробуешь ещё раз?',
                 reply_markup=main_keyboard()
             )
-    return CHOOSING
 
 
 def handle_surrender(update, context):
@@ -124,32 +116,14 @@ if __name__ == '__main__':
     database = None
     database = get_database_connection()
 
-
-    CHOOSING = States.CHOOSING
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-
-        states={
-            CHOOSING: [
-                MessageHandler(Filters.regex('Новый вопрос'),
-                             handle_chosen_question_request
-                             ),
-                MessageHandler(Filters.regex('Сдаться'),
-                               handle_surrender
-                               ),
-                MessageHandler(Filters.text,
-                               handle_solution_attempt,
-                               ),
-            ],
-        },
-
-        fallbacks=[]
-    )
-
     updater = Updater(tg_token, use_context=True)
     dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(conv_handler)
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(MessageHandler(Filters.regex('Новый вопрос'), handle_chosen_question_request))
+    dispatcher.add_handler(MessageHandler(Filters.regex('Сдаться'), handle_surrender))
+    dispatcher.add_handler(MessageHandler(Filters.text, handle_solution_attempt))
+
     dispatcher.add_error_handler(error)
 
     updater.start_polling()
