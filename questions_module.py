@@ -32,5 +32,4 @@ def collect_questions(files_dir):
 def get_random_question(collection):
     question_count = len(collection)
     random_question_index = random.randint(0, question_count + 1)
-    print(collection[random_question_index])
     return collection[random_question_index].get('question'), collection[random_question_index].get('answer')
