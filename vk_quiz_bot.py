@@ -101,9 +101,6 @@ if __name__ == "__main__":
     quiz_questions = collect_questions(files_dir)
     send_chosen_question = partial(send_question, questions=quiz_questions)
 
-    database = None
-    database = get_database_connection()
-
     vk_access_token = env('VK_ACCESS_TOKEN')
     vk_session = vk.VkApi(token=vk_access_token)
     vk_api = vk_session.get_api()

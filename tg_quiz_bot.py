@@ -113,9 +113,6 @@ if __name__ == '__main__':
     quiz_questions = collect_questions(files_dir)
     handle_chosen_question_request = partial(handle_new_question_request, questions=quiz_questions)
 
-    database = None
-    database = get_database_connection()
-
     updater = Updater(tg_token, use_context=True)
     dispatcher = updater.dispatcher
 
