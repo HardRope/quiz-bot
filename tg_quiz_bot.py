@@ -10,6 +10,7 @@ from telegram.ext import (CommandHandler, Filters,
 from telegram_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_quiz_question
 
+logger = logging.getLogger(__name__)
 
 def get_database_connection():
     global database
@@ -108,7 +109,7 @@ if __name__ == '__main__':
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.INFO
     )
-    logger = logging.getLogger(__name__)
+
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)
     handle_chosen_question_request = partial(handle_new_question_request, questions=quiz_questions)
