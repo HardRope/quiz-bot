@@ -1,11 +1,13 @@
 import logging
 import json
 import enum
+from functools import partial
 
 from environs import Env
 import redis
 from telegram.ext import (CommandHandler, Filters,
                           MessageHandler, ConversationHandler, Updater)
+
 from telegram_tools.keyboards import main_keyboard
 from questions_module import collect_questions, get_random_question
 
@@ -42,11 +44,11 @@ def start(update, context):
     return CHOOSING
 
 
-def handle_new_question_request(update, context):
+def handle_new_question_request(update, context, questions):
     chat_id = update.message.chat_id
     db = get_database_connection()
 
-    question, answer = get_random_question(quiz_questions)
+    question, answer = get_random_question(questions)
     context.bot.send_message(
         chat_id=chat_id,
         text=question,
@@ -100,7 +102,7 @@ def handle_surrender(update, context):
         chat_id=chat_id,
         text=f'Правильный ответ:\n{answer}'
     )
-    handle_new_question_request(update, context)
+    handle_chosen_question_request(update, context)
 
 
 if __name__ == '__main__':
@@ -116,6 +118,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)
+    handle_chosen_question_request = partial(handle_new_question_request, questions=quiz_questions)
 
     database = None
     database = get_database_connection()
@@ -128,7 +131,7 @@ if __name__ == '__main__':
         states={
             CHOOSING: [
                 MessageHandler(Filters.regex('Новый вопрос'),
-                             handle_new_question_request
+                             handle_chosen_question_request
                              ),
                 MessageHandler(Filters.regex('Сдаться'),
                                handle_surrender

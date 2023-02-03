@@ -1,4 +1,5 @@
 import json
+from functools import partial
 from environs import Env
 import redis
 
@@ -31,10 +32,10 @@ def welcome(event, vk_api):
     )
 
 
-def send_question(event, vk_api):
+def send_question(event, vk_api, questions):
     db = get_database_connection()
 
-    question, answer = get_random_question(quiz_questions)
+    question, answer = get_random_question(questions)
     vk_api.messages.send(
         user_id=event.user_id,
         message=question,
@@ -86,7 +87,7 @@ def user_surrend(event, vk_api):
         keyboard=main_keyboard(),
         random_id=get_random_id()
     )
-    send_question(event, vk_api)
+    send_chosen_question(event, vk_api)
 
 
 if __name__ == "__main__":
@@ -95,6 +96,7 @@ if __name__ == "__main__":
 
     files_dir = env('QUESTIONS_DIR')
     quiz_questions = collect_questions(files_dir)
+    send_chosen_question = partial(send_question, questions=quiz_questions)
 
     database = None
     database = get_database_connection()
@@ -108,7 +110,7 @@ if __name__ == "__main__":
 
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             if event.text == 'Новый вопрос':
-                send_question(event, vk_api)
+                send_chosen_question(event, vk_api)
             elif event.text == 'Сдаться':
                 user_surrend(event, vk_api)
             elif event.text:
